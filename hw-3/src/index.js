@@ -1,10 +1,16 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
+import { Provider } from "react-redux";
 import TodoList from "./TodoList";
+import store from "./redux";
 
-ReactDOM.render(
+const root = document.getElementById("root");
+const reactRoot = createRoot(root);
+
+reactRoot.render(
   <React.StrictMode>
-    <TodoList />
-  </React.StrictMode>,
-  document.getElementById("root")
+    <Provider store={store}>
+      <TodoList />
+    </Provider>
+  </React.StrictMode>
 );

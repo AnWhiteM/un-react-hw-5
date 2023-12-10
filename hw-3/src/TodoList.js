@@ -1,61 +1,47 @@
-import React, { useReducer, useState } from "react";
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { addTask, editTask, deleteTask, toggleTaskStatus } from "./redux";
 import "./TodoList.css";
 
-const todoReducer = (state, action) => {
-  switch (action.type) {
-    case "ADD_TASK":
-      return [...state, { text: action.payload, completed: false }];
-    case "EDIT_TASK":
-      const updatedTasks = [...state];
-      updatedTasks[action.index].text = action.payload;
-      return updatedTasks;
-    case "DELETE_TASK":
-      return state.filter((_, i) => i !== action.index);
-    case "TOGGLE_TASK_STATUS":
-      const toggledTasks = [...state];
-      toggledTasks[action.index].completed = !toggledTasks[action.index]
-        .completed;
-      return toggledTasks;
-    default:
-      return state;
-  }
-};
-
 const TodoList = () => {
-  const [tasks, dispatch] = useReducer(todoReducer, []);
+  const dispatch = useDispatch();
+  const tasks = useSelector((state) => state);
   const [newTask, setNewTask] = useState("");
 
-  const addTask = () => {
+  const handleAddTask = () => {
     if (newTask.trim() !== "") {
-      dispatch({ type: "ADD_TASK", payload: newTask });
+      dispatch(addTask(newTask));
       setNewTask("");
     }
   };
 
-  const editTask = (index, newText) => {
-    dispatch({ type: "EDIT_TASK", index, payload: newText });
+  const handleEditTask = (index) => {
+    const newText = prompt("Edit task:", tasks[index].text);
+    if (newText !== null) {
+      dispatch(editTask(index, newText));
+    }
   };
 
-  const deleteTask = (index) => {
-    dispatch({ type: "DELETE_TASK", index });
+  const handleDeleteTask = (index) => {
+    dispatch(deleteTask(index));
   };
 
-  const toggleTaskStatus = (index) => {
-    dispatch({ type: "TOGGLE_TASK_STATUS", index });
+  const handleToggleTaskStatus = (index) => {
+    dispatch(toggleTaskStatus(index));
   };
 
   return (
     <div className="todo-list-container">
-      <h1 class="title">Todo List</h1>
-      <div class="button-div">
+      <h1 className="title">Todo List</h1>
+      <div className="button-div">
         <input
           type="text"
           value={newTask}
           onChange={(e) => setNewTask(e.target.value)}
           placeholder="Add a new task"
-          class="taskInput"
+          className="taskInput"
         />
-        <button onClick={addTask} class="button">
+        <button onClick={handleAddTask} className="button">
           Add
         </button>
       </div>
@@ -63,16 +49,18 @@ const TodoList = () => {
         {tasks.map((task, index) => (
           <li key={index} className={task.completed ? "completed" : ""}>
             <span>{task.text}</span>
-            <div class="todo-buttons">
+            <div className="todo-buttons">
+              <button onClick={() => handleEditTask(index)}>Edit</button>
               <button
-                onClick={() => editTask(index, prompt("Edit task:", task.text))}
+                onClick={() => handleDeleteTask(index)}
+                className="button"
               >
-                Edit
-              </button>
-              <button onClick={() => deleteTask(index)} class="button">
                 Delete
               </button>
-              <button onClick={() => toggleTaskStatus(index)} class="button">
+              <button
+                onClick={() => handleToggleTaskStatus(index)}
+                className="button"
+              >
                 {task.completed ? "Undo" : "Complete"}
               </button>
             </div>
